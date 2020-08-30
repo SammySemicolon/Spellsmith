@@ -1,0 +1,3 @@
+displayName = Spellsmith
+author = Sammy and Cherry
+version = 0.1
