@@ -9,14 +9,14 @@ namespace Spellsmith.Items.EnchantedRunes.Modifiers
 		{
 			AddModifierDescriptionTooltip(tooltips, "Grants a chance for the effect to happen an additional time");
 			AddDamageIncreaseTooltip(tooltips, -10);
-			AddManaCostIncreaseTooltip(tooltips, 50);
+			AddManaCostIncreaseTooltip(tooltips, 25);
 			base.ModifyTooltips(tooltips);
 		}
 		public override void setup(Effect effect)
 		{
-			effect.flurry++;
-			effect.damageMultiplier *= 0.9f;
-			effect.manaCostMultiplier *= 1.5f;
+			effect.modifiers.flurryModifier++;
+			effect.modifiers.damageMultiplier *= 0.9f;
+			effect.modifiers.manaCostMultiplier *= 1.25f;
 		}
 	}
 }

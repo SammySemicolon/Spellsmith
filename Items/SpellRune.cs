@@ -184,6 +184,7 @@ namespace Spellsmith.Items
                 if (rune.modItem is EffectRune)
                 {
                     EffectRune effectRune = (EffectRune)rune.modItem;
+                    effectRune.effect.setup();
                     effects.Add(effectRune.effect);
                 }
                 if (effects.Count != 0)

@@ -8,17 +8,17 @@ namespace Spellsmith.Items.EnchantedRunes.Modifiers
 		public override void ModifyTooltips(List<TooltipLine> tooltips)
 		{
 			AddModifierDescriptionTooltip(tooltips, "Splits the effect into 2 smaller ones");
-			AddDamageIncreaseTooltip(tooltips, -30);
+			AddDamageIncreaseTooltip(tooltips, -20);
 			AddManaCostIncreaseTooltip(tooltips, 20);
 			AddAccuracyIncreaseTooltip(tooltips, 10);
 			base.ModifyTooltips(tooltips);
 		}
 		public override void setup(Effect effect)
 		{
-			effect.split++;
-			effect.damageMultiplier *= 0.7f;
-			effect.accuracy *= 0.9f;
-			effect.manaCostMultiplier *= 1.2f;
+			effect.modifiers.splitModifier++;
+			effect.modifiers.damageMultiplier *= 0.8f;
+			effect.modifiers.accuracy *= 0.9f;
+			effect.modifiers.manaCostMultiplier *= 1.2f;
 		}
 	}
 }

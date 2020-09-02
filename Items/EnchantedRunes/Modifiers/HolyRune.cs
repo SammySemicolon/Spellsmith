@@ -13,8 +13,8 @@ namespace Spellsmith.Items.EnchantedRunes.Modifiers
 		}
 		public override void setup(Effect effect)
 		{
-			effect.holy = true;
-			effect.manaCostMultiplier *= 2f;
+			effect.modifiers.holyModifier = true;
+			effect.modifiers.manaCostMultiplier *= 2f;
 		}
 	}
 }

@@ -13,8 +13,8 @@ namespace Spellsmith.Items.EnchantedRunes.Modifiers
         }
         public override void setup(Effect effect)
 		{
-			effect.corrupt = true;
-			effect.manaCostMultiplier *= 1.6f;
+			effect.modifiers.corruptModifier = true;
+			effect.modifiers.manaCostMultiplier *= 1.6f;
 		}
     }
 }

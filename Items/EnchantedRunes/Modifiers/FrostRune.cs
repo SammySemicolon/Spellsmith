@@ -13,8 +13,8 @@ namespace Spellsmith.Items.EnchantedRunes.Modifiers
 		}
 		public override void setup(Effect effect)
 		{
-			effect.frost = true;
-			effect.manaCostMultiplier *= 1.4f;
+			effect.modifiers.frostModifier = true;
+			effect.modifiers.manaCostMultiplier *= 1.4f;
 		}
 	}
 }

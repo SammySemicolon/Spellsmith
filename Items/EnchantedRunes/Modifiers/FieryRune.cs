@@ -13,8 +13,8 @@ namespace Spellsmith.Items.EnchantedRunes.Modifiers
 		}
 		public override void setup(Effect effect)
 		{
-			effect.fiery = true;
-			effect.manaCostMultiplier *= 1.2f;
+			effect.modifiers.fieryModifier = true;
+			effect.modifiers.manaCostMultiplier *= 1.2f;
 		}
 	}
 }

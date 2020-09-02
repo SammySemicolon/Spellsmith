@@ -11,14 +11,28 @@ namespace Spellsmith
 {
     public class SpellsmithPlayer : ModPlayer
     {
-        public int selectedSpell;
-        public List<Effect> cooldownEffects = new List<Effect>();
+        public int selectedSpell; 
         public List<Effect> activeEffects = new List<Effect>();
-        List<Effect> removedEffects = new List<Effect>();
+        public List<ActiveEffectData> tickingEffects = new List<ActiveEffectData>();
+        List<Effect> removedEffects;
+        List<ActiveEffectData> removedData;
         public Item activeBlaster;
         public override void UpdateLifeRegen()
         {
+            if (Spellsmith.instance.abilityInterface.CurrentState == null)
+            {
+                if (player.HeldItem.modItem is SpellBlaster)
+                {
+                    Spellsmith.instance.ShowAbilityUI();
+                }
+            }
+            else if (!(player.HeldItem.modItem is SpellBlaster))
+            {
+                Spellsmith.instance.HideAbilityUI();
+            }
+
             removedEffects = new List<Effect>();
+            removedData = new List<ActiveEffectData>();
             if (activeBlaster != null)
             {
                 foreach (Effect effect in activeEffects)
@@ -35,7 +49,7 @@ namespace Spellsmith
                                 }
                             case SpellStyle.HoldRelease:
                                 {
-                                    effect.Charge(player, activeBlaster);
+                                    effect.data.Charge(player);
                                     if (!player.channel)
                                     {
                                         RunSpell(effect, velocity);
@@ -44,7 +58,7 @@ namespace Spellsmith
                                 }
                             case SpellStyle.Charge:
                                 {
-                                    bool success = effect.Charge(player, activeBlaster);
+                                    bool success = effect.data.Charge(player);
                                     if (success || !player.channel)
                                     {
                                         RunSpell(effect, velocity);
@@ -53,7 +67,7 @@ namespace Spellsmith
                                 }
                             case SpellStyle.ChargeRelease:
                                 {
-                                    effect.Charge(player, activeBlaster);
+                                    effect.data.Charge(player);
                                     if (!player.channel)
                                     {
                                         RunSpell(effect, velocity);
@@ -62,33 +76,44 @@ namespace Spellsmith
                                 }
                         }
                     }
+                    else
+                    {
+                        removedEffects.Add(effect);
+                    }
                 }
             }
-            foreach (Effect cooldownEffect in cooldownEffects)
+            foreach (ActiveEffectData tickingEffect in tickingEffects)
             {
-                bool success = cooldownEffect.ReduceCooldown(player, activeBlaster);
+                bool success = tickingEffect.ReduceCooldown();
                 if (success)
                 {
-                    removedEffects.Add(cooldownEffect);
+                    removedEffects.Add(tickingEffect.effect);
+                    removedData.Add(tickingEffect);
                 }
             }
-            foreach (Effect cooldownEffect in removedEffects)
+            foreach (Effect effectToRemove in removedEffects)
             {
-                activeEffects.Remove(cooldownEffect);
-                cooldownEffects.Remove(cooldownEffect);
+                if (activeEffects.Contains(effectToRemove))
+                {
+                    activeEffects.Remove(effectToRemove);
+                }
+            }
+            foreach (ActiveEffectData dataToRemove in removedData)
+            {
+                if (tickingEffects.Contains(dataToRemove))
+                {
+                    tickingEffects.Remove(dataToRemove);
+                }
             }
         }
         public void RunSpell(Effect effect, Vector2 velocity)
         {
             effect.RunSpell(player, activeBlaster, velocity, activeBlaster.shootSpeed, activeBlaster.damage, activeBlaster.knockBack);
-            if (effect.maxCooldown != 0)
+            if (effect.getTotalCooldown() != 0)
             {
-                cooldownEffects.Add(effect);
+                tickingEffects.Add(effect.data);
             }
-            else
-            {
-                removedEffects.Add(effect);
-            }
+            removedEffects.Add(effect);
         }
         public override void ProcessTriggers(TriggersSet triggersSet)
         {

@@ -17,6 +17,7 @@ namespace Spellsmith.Items.EnchantedRunes.Effects
 	{
 		public ShootArrowEffect()
 		{
+			setup();
 			manaCost = 4;
 			tooltip = "Shoots an arrow";
 		}
@@ -28,23 +29,23 @@ namespace Spellsmith.Items.EnchantedRunes.Effects
 		public int GetArrow()
 		{
 			List<int> arrows = new List<int>();
-			if (fiery)
+			if (modifiers.fieryModifier)
 			{
 				arrows.Add(ProjectileID.FireArrow);
 			}
-			if (frost)
+			if (modifiers.frostModifier)
 			{
 				arrows.Add(ProjectileID.FrostburnArrow);
 			}
-			if (holy)
+			if (modifiers.holyModifier)
 			{
 				arrows.Add(ProjectileID.HolyArrow);
 			}
-			if (crimson)
+			if (modifiers.crimsonModifier)
 			{
 				arrows.Add(ProjectileID.IchorArrow);
 			}
-			if (corrupt)
+			if (modifiers.corruptModifier)
 			{
 				arrows.Add(ProjectileID.CursedArrow);
 			}

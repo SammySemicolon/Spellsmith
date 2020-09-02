@@ -42,26 +42,26 @@ namespace Spellsmith.Items.EnchantedRunes
             if (player is Player)
             {
                 string deathMessage = player.name + " fucked up their spell";
-                if (fiery)
+               /* if (fieryModifier)
                 {
                     deathMessage = player.name + " erupted into flames";
                 }
-                if (frost)
+                if (frostModifier)
                 {
                     deathMessage = player.name + " became a cube of ice";
                 }
-                if (holy)
+                if (holyModifier)
                 {
                     deathMessage = player.name + " turned into rainbow dust";
                 }
-                if (crimson)
+                if (crimsonModifier)
                 {
                     deathMessage = player.name + " became a clump of flesh";
                 }
-                if (corrupt)
+                if (corruptModifier)
                 {
                     deathMessage = player.name + " sacrificed themselves to the dark gods";
-                }
+                }*/ //redo this one day
                 player.KillMe(PlayerDeathReason.ByCustomReason(deathMessage), player.statLifeMax2, 0);
             }
         }

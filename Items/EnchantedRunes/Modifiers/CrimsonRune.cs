@@ -13,8 +13,8 @@ namespace Spellsmith.Items.EnchantedRunes.Modifiers
 		}
 		public override void setup(Effect effect)
 		{
-			effect.crimson = true;
-			effect.manaCostMultiplier *= 1.8f;
+			effect.modifiers.crimsonModifier = true;
+			effect.modifiers.manaCostMultiplier *= 1.8f;
 		}
 	}
 }

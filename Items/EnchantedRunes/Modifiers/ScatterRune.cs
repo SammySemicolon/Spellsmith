@@ -14,9 +14,9 @@ namespace Spellsmith.Items.EnchantedRunes.Modifiers
 		}
 		public override void setup(Effect effect)
 		{
-			effect.scatter++;
-			effect.damageMultiplier *= 0.8f;
-			effect.manaCostMultiplier *= 1.8f;
+			effect.modifiers.scatterModifier++;
+			effect.modifiers.damageMultiplier *= 0.8f;
+			effect.modifiers.manaCostMultiplier *= 1.8f;
 		}
     }
 }
