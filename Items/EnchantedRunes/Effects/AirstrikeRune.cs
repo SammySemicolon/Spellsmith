@@ -11,21 +11,28 @@ namespace Spellsmith.Items.EnchantedRunes.Effects
 	{
 		public override void SetStaticDefaults()
 		{
-			Tooltip.SetDefault("Nuclear Bombardment lol");
+			DisplayName.SetDefault("Enchanted Rune: 'Airstrike'");
 		}
 		public override Effect effect => new AirstrikeEffect();
 	}
 	public class AirstrikeEffect : Effect
 	{
+		public AirstrikeEffect()
+        {
+			maxCooldown = 600;
+			manaCost = 40;
+			damageMultiplier = 2f;
+			tooltip = "Calls down an orbital airstrike at your mouse position";
+		}
 		public override SpellType Type => SpellType.Ranged;
         public override SpellStyle Style => SpellStyle.HoldRelease;
-		public override void DoEffect(Entity entity, Item item, Vector2 originalVelocity, float shootSpeed, int damage, float knockBack, int importantRun = 0, int totalImportantRuns = 0)
+		public override void DoEffect(Player player, Item item, Vector2 originalVelocity, float shootSpeed, int damage, float knockBack, int importantRun = 0, int totalImportantRuns = 0)
 		{
-			ShootSkyProjectile(entity, item, 1200 * (importantRun + 1), 6, damage, knockBack, ModContent.ProjectileType<Airstrike>(), importantRun, totalImportantRuns);
+			ShootSkyProjectile(player, item, 1200 * (importantRun + 1), 12, damage, knockBack, ModContent.ProjectileType<Airstrike>(), importantRun, totalImportantRuns);
 		}
-		public override void ModifyProjectile(Entity entity, Projectile projectile, Vector2 executePosition = default)
+		public override void ModifyProjectile(Player player, Projectile projectile, Vector2 executePosition = default)
         {
-            base.ModifyProjectile(entity, projectile, executePosition);
+            base.ModifyProjectile(player, projectile, executePosition);
 			Airstrike airstrike = projectile.modProjectile as Airstrike;
 			airstrike.Y = executePosition.Y;
 			projectile.netUpdate = true;

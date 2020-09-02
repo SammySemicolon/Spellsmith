@@ -14,12 +14,35 @@ namespace Spellsmith.Items
         public List<Item> runes = new List<Item>();
         public List<Effect> effects = new List<Effect>();
         bool setupRunes = false;
-		public override void SetStaticDefaults() 
-		{
-			Tooltip.SetDefault("Saving Data Test");
-		}
+        public override void ModifyTooltips(List<TooltipLine> tooltips)
+        {
+            int maxCooldown = 0; 
+            string effectsString = "";
 
-		public override void SetDefaults() 
+            foreach (Effect effect in effects)
+            {
+                if (effect.maxCooldown > maxCooldown)
+                {
+                    maxCooldown = (int)effect.maxCooldown;
+                }
+            }
+            foreach (Item rune in runes)
+            {
+                effectsString += rune.Name + " ";
+            }
+            if (setupRunes)
+            {
+                tooltips.Add(new TooltipLine(Spellsmith.instance, "SpellRuneTooltip", "Contains a spell"));
+                tooltips.Add(new TooltipLine(Spellsmith.instance, "SpellRuneEffects", effectsString));
+                string manaCostTooltip = GetManaCost(Main.LocalPlayer) == 0 ? "Uses no mana" : "Uses " + GetManaCost(Main.LocalPlayer) + " mana";
+                tooltips.Add(new TooltipLine(Spellsmith.instance, "SpellRuneManaCost", manaCostTooltip));
+                string cooldown = maxCooldown == 0 ? "No Cooldown" : maxCooldown / 60 + " Second cooldown";
+                tooltips.Add(new TooltipLine(Spellsmith.instance, "SpellRuneCooldown", cooldown));
+            }
+            base.ModifyTooltips(tooltips);
+        }
+
+        public override void SetDefaults() 
 		{
 			item.width = 40;
 			item.height = 40;
@@ -30,6 +53,61 @@ namespace Spellsmith.Items
         public override bool CanRightClick()
         {
             return true;
+        }
+
+        public override ModItem Clone(Item item)
+        {
+            var newItem = base.Clone(item) as SpellRune;
+            var oldItem = item.modItem as SpellRune;
+
+            if (oldItem.setupRunes)
+            {
+                newItem.runes = oldItem.runes;
+                newItem.effects = oldItem.effects;
+                newItem.setupRunes = true;
+            }
+            return newItem;
+        }
+        public override ModItem Clone()
+        {
+            var newItem = base.Clone() as SpellRune;
+            var oldItem = item.modItem as SpellRune;
+
+            if (oldItem.setupRunes)
+            {
+                newItem.runes = oldItem.runes;
+                newItem.effects = oldItem.effects;
+                newItem.setupRunes = true;
+            }
+            return newItem;
+        }
+        public override TagCompound Save()
+        {
+            if (setupRunes)
+            {
+                TagCompound newCompound = new TagCompound();
+                newCompound.Add("rune_count", runes.Count);
+                for (int i = 0; i < runes.Count; i++)
+                {
+                    newCompound.Add("rune_" + i, runes[i]);
+                }
+                return newCompound;
+            }
+            return null;
+        }
+        public override void Load(TagCompound tag)
+        {
+            if (tag.ContainsKey("rune_count"))
+            {
+                List<Item> testRunes = new List<Item>();
+                int runeCount = tag.GetInt("rune_count");
+                for (int i = 0; i < runeCount; i++)
+                {
+                    testRunes.Add(tag.Get<Item>("rune_" + i));
+                }
+                CompleteSet(testRunes);
+            }
+            base.Load(tag);
         }
         public override void RightClick(Player player)
         {
@@ -123,61 +201,20 @@ namespace Spellsmith.Items
                     }
                 }
             }
+            foreach(Effect effect in effects)
+            {
+                effect.bundledEffects = effects.Count;
+            }
             setupRunes = true;
         }
-        public override ModItem Clone(Item item)
+        public int GetManaCost(Player player)
         {
-            var newItem = base.Clone(item) as SpellRune;
-            var oldItem = item.modItem as SpellRune;
-
-            if (oldItem.setupRunes)
+            int combinedEffectCost = 0;
+            foreach(Effect effect in effects)
             {
-                newItem.runes = oldItem.runes;
-                newItem.effects = oldItem.effects;
-                newItem.setupRunes = true;
+                combinedEffectCost += effect.getTotalManaCost(player);
             }
-            return newItem;
-        }
-        public override ModItem Clone()
-        {
-            var newItem = base.Clone() as SpellRune;
-            var oldItem = item.modItem as SpellRune;
-
-            if (oldItem.setupRunes)
-            {
-                newItem.runes = oldItem.runes;
-                newItem.effects = oldItem.effects;
-                newItem.setupRunes = true;
-            }
-            return newItem;
-        }
-        public override TagCompound Save()
-        {
-            if (setupRunes)
-            {
-                TagCompound newCompound = new TagCompound();
-                newCompound.Add("rune_count", runes.Count);
-                for (int i = 0; i < runes.Count; i++)
-                {
-                    newCompound.Add("rune_" + i, runes[i]);
-                }
-                return newCompound;
-            }
-            return null;
-        }
-        public override void Load(TagCompound tag)
-        {
-            if (tag.ContainsKey("rune_count"))
-            {
-                List<Item> testRunes = new List<Item>();
-                int runeCount = tag.GetInt("rune_count");
-                for (int i = 0; i < runeCount;i++)
-                {
-                    testRunes.Add(tag.Get<Item>("rune_" + i));
-                }
-                CompleteSet(testRunes);
-            }
-            base.Load(tag);
+            return combinedEffectCost;
         }
     }
 }

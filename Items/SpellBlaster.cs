@@ -31,19 +31,43 @@ namespace Spellsmith.Items
             item.rare = ItemRarityID.Green;
             item.UseSound = SoundID.Item11;
             item.autoReuse = true;
+            item.channel = true;
             item.shoot = 10;
             item.shootSpeed = 16f;
         }
+        public override bool CanUseItem(Player player)
+        {
+            if (spellRune != null)
+            {
+                foreach (Effect effect in spellRune.effects)
+                {
+                    if (effect.cooldown != 0)
+                    {
+                        return false;
+                    }
+                    if (!effect.CanRunSpell(player,item))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return base.CanUseItem(player);
+        }
         public override bool Shoot(Player player, ref Vector2 position, ref float speedX, ref float speedY, ref int type, ref int damage, ref float knockBack)
         {
-            Item ammo = (Item)player.inventory.GetValue(54);
+            SpellsmithPlayer modPlayer = player.GetModPlayer<SpellsmithPlayer>();
+            Item ammo = (Item)player.inventory.GetValue(54 + modPlayer.selectedSpell);
             spellRune = (SpellRune)ammo.modItem;
 
             if (spellRune != null)
             {
                 foreach (Effect effect in spellRune.effects)
                 {
-                    effect.RunSpell(player, this.item, new Vector2(speedX, speedY), item.shootSpeed, damage, knockBack);
+                    if (!modPlayer.activeEffects.Contains(effect))
+                    {
+                        modPlayer.activeEffects.Add(effect);
+                    }
+                    modPlayer.activeBlaster = item;
                 }
             }
             return false;

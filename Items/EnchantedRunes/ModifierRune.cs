@@ -1,23 +1,46 @@
 using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.ModLoader;
+
 namespace Spellsmith.Items.EnchantedRunes
 {
-    public class ModifierRune : BaseRune
+    public abstract class ModifierRune : BaseRune
     {
-        public override void SetStaticDefaults()
+        public void AddModifierDescriptionTooltip(List<TooltipLine> tooltips, string description)
         {
-            Tooltip.SetDefault("Modify");
+            tooltips.Add(new TooltipLine(Spellsmith.instance, "ModifierTooltip", description));
+        }
+        public void AddManaCostIncreaseTooltip(List<TooltipLine> tooltips, int percentage)
+        {
+            string manaCost = "Effect uses " + Math.Abs(percentage) + (percentage > 0 ? "% more mana" : "% less mana");
+            tooltips.Add(new TooltipLine(Spellsmith.instance, "ModifierManaCost", manaCost));
+        }
+        public void AddCooldownIncreaseTooltip(List<TooltipLine> tooltips, int percentage)
+        {
+            string cooldown = "Effect cooldown is " + Math.Abs(percentage) + (percentage > 0 ? "% longer" : "% shorter");
+            tooltips.Add(new TooltipLine(Spellsmith.instance, "ModifierCooldown", cooldown));
+        }
+        public void AddDamageIncreaseTooltip(List<TooltipLine> tooltips, int percentage)
+        {
+            string damage = "Effect deals " + Math.Abs(percentage) + (percentage > 0 ? "% more damage" : "% less damage");
+            tooltips.Add(new TooltipLine(Spellsmith.instance, "ModifierDamage", damage));
+        }
+        public void AddAccuracyIncreaseTooltip(List<TooltipLine> tooltips, int percentage)
+        {
+            string accuracy = "Effect is " + Math.Abs(percentage) + (percentage > 0 ? "% more accurate" : "% less accurate");
+            tooltips.Add(new TooltipLine(Spellsmith.instance, "ModifierAccuracy", accuracy));
         }
         public DefaultFuckUpEffect fuckUpEffect => new DefaultFuckUpEffect();
     }
     public class DefaultFuckUpEffect : Effect
     {
-        public override void DoEffect(Entity entity, Item item, Vector2 originalVelocity, float shootSpeed, int damage, float knockBack, int importantRun = 0, int totalImportantRuns = -10)
+        public override void DoEffect(Player player, Item item, Vector2 originalVelocity, float shootSpeed, int damage, float knockBack, int importantRun = 0, int totalImportantRuns = -10)
         {
-            if (entity is Player)
+            if (player is Player)
             {
-                Player player = (Player)entity;
                 string deathMessage = player.name + " fucked up their spell";
                 if (fiery)
                 {
