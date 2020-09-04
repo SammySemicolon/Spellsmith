@@ -11,7 +11,7 @@ namespace Spellsmith.Items.EnchantedRunes.Modifiers
 			AddManaCostIncreaseTooltip(tooltips, 40);
 			base.ModifyTooltips(tooltips);
 		}
-		public override void setup(Effect effect)
+		public override void setup(SpellEffect effect)
 		{
 			effect.modifiers.frostModifier = true;
 			effect.modifiers.manaCostMultiplier *= 1.4f;

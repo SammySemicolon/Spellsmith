@@ -41,7 +41,7 @@ namespace Spellsmith.Items
 
             if (spellRune != null)
             {
-                foreach (Effect effect in spellRune.effects)
+                foreach (SpellEffect effect in spellRune.effects)
                 {
                     if (!effect.CanRunSpell(player,item))
                     {
@@ -58,7 +58,7 @@ namespace Spellsmith.Items
 
             if (spellRune != null)
             {
-                foreach (Effect effect in spellRune.effects)
+                foreach (SpellEffect effect in spellRune.effects)
                 {
                     if (!modPlayer.activeEffects.Contains(effect))
                     {

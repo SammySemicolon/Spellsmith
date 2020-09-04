@@ -11,9 +11,9 @@ namespace Spellsmith.Items.EnchantedRunes.Effects
 		{
 			DisplayName.SetDefault("Enchanted Rune: Arrow");
 		}
-		public override Effect effect => new ShootArrowEffect();
+		public override SpellEffect effect => new ShootArrowEffect();
 	}
-	public class ShootArrowEffect : Effect
+	public class ShootArrowEffect : SpellEffect
 	{
 		public ShootArrowEffect()
 		{
@@ -22,9 +22,9 @@ namespace Spellsmith.Items.EnchantedRunes.Effects
 			tooltip = "Shoots an arrow";
 		}
 		public override SpellType Type => SpellType.Ranged;
-		public override void DoEffect(Player player, Item item, Vector2 originalVelocity, float shootSpeed, int damage, float knockBack, int importantRun = 0, int totalImportantRuns = 0)
+		public override void DoEffect(Player player, Vector2 position, Item item, Vector2 originalVelocity, float shootSpeed, int damage, float knockBack, int importantRun = 0, int totalImportantRuns = 0)
 		{
-			ShootProjectile(player, originalVelocity, shootSpeed, damage, knockBack, GetArrow(), importantRun, totalImportantRuns);
+			ShootProjectile(player, position, originalVelocity, shootSpeed, damage, knockBack, GetArrow(), importantRun, totalImportantRuns);
 		}
 		public int GetArrow()
 		{

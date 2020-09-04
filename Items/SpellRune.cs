@@ -12,14 +12,14 @@ namespace Spellsmith.Items
 	public class SpellRune : ModItem
 	{
         public List<Item> runes = new List<Item>();
-        public List<Effect> effects = new List<Effect>();
+        public List<SpellEffect> effects = new List<SpellEffect>();
         bool setupRunes = false;
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             int maxCooldown = 0; 
             string effectsString = "";
 
-            foreach (Effect effect in effects)
+            foreach (SpellEffect effect in effects)
             {
                 if (effect.maxCooldown > maxCooldown)
                 {
@@ -117,7 +117,7 @@ namespace Spellsmith.Items
             {
                 Main.NewText(rune);
             }
-            foreach (Effect effect in effects)
+            foreach (SpellEffect effect in effects)
             {
                 Main.NewText(effect);
             }
@@ -202,7 +202,7 @@ namespace Spellsmith.Items
                     }
                 }
             }
-            foreach(Effect effect in effects)
+            foreach(SpellEffect effect in effects)
             {
                 effect.bundledEffects = effects.Count;
             }
@@ -211,7 +211,7 @@ namespace Spellsmith.Items
         public int GetManaCost(Player player)
         {
             int combinedEffectCost = 0;
-            foreach(Effect effect in effects)
+            foreach(SpellEffect effect in effects)
             {
                 combinedEffectCost += effect.getTotalManaCost(player);
             }

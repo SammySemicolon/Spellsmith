@@ -13,9 +13,9 @@ namespace Spellsmith.Items.EnchantedRunes.Effects
 		{
 			DisplayName.SetDefault("Enchanted Rune: 'Airstrike'");
 		}
-		public override Effect effect => new AirstrikeEffect();
+		public override SpellEffect effect => new AirstrikeEffect();
 	}
-	public class AirstrikeEffect : Effect
+	public class AirstrikeEffect : SpellEffect
 	{
 		public AirstrikeEffect()
         {
@@ -26,7 +26,7 @@ namespace Spellsmith.Items.EnchantedRunes.Effects
 		}
 		public override SpellType Type => SpellType.Ranged;
         public override SpellStyle Style => SpellStyle.HoldRelease;
-		public override void DoEffect(Player player, Item item, Vector2 originalVelocity, float shootSpeed, int damage, float knockBack, int importantRun = 0, int totalImportantRuns = 0)
+		public override void DoEffect(Player player, Vector2 position, Item item, Vector2 originalVelocity, float shootSpeed, int damage, float knockBack, int importantRun = 0, int totalImportantRuns = 0)
 		{
 			ShootSkyProjectile(player, item, 1200 * (importantRun + 1), 30, damage, knockBack, ModContent.ProjectileType<Airstrike>(), importantRun, totalImportantRuns);
 		}
@@ -38,7 +38,7 @@ namespace Spellsmith.Items.EnchantedRunes.Effects
 			projectile.netUpdate = true;
 			projectile.ai[0] += Main.rand.NextFloat(0, 621f);
 			projectile.rotation += Main.rand.NextFloat(0, 621f);
-			airstrike.SetupColor(new Color(255, 217, 62));
+			airstrike.color = SetupColor(new Color(255, 217, 62), Element);
 		}
     }
 }

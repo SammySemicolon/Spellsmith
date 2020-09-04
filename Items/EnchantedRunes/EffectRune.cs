@@ -20,11 +20,11 @@ namespace Spellsmith.Items.EnchantedRunes
             tooltips.Add(new TooltipLine(Spellsmith.instance, "EffectCooldown", cooldown));
             base.ModifyTooltips(tooltips);
         }
-        public virtual Effect effect => null;
+        public virtual SpellEffect effect => null;
     }
-    public class Effect
+    public class SpellEffect
     {
-        public Effect()
+        public SpellEffect()
         {
             setup();
         }
@@ -123,29 +123,43 @@ namespace Spellsmith.Items.EnchantedRunes
         }
         public virtual bool CanRunSpell(Player player, Item item)
         {
-            return !data.OnCooldown && player.statMana >= getTotalManaCost(player);
+            if (Style == SpellStyle.Default || Style == SpellStyle.HoldRelease)
+            {
+                return !data.OnCooldown && player.statMana >= getTotalManaCost(player);
+            }
+            else
+            {
+                return !data.OnCooldown && player.statMana >= getTotalManaCost(player, getChargePercentage());
+            }
         }
-        public void RunSpell(Player player, Item item, Vector2 originalVelocity, float shootSpeed, int damage, float knockBack)
+        public void RunSpell(Player player, Vector2 position, Item item, Vector2 originalVelocity, float shootSpeed, int damage, float knockBack)
         {
+
             int totalImportantRuns = getTotalEffectImportantRuns();
             if (totalImportantRuns >= 1)
             {
                 for (int i = 0; i <= totalImportantRuns; i++)
                 {
-                    DoEffect(player, item, originalVelocity, shootSpeed, damage, knockBack, i, totalImportantRuns);
+                    DoEffect(player, position, item, originalVelocity, shootSpeed, damage, knockBack, i, totalImportantRuns);
                 }
             }
             else
             {
-                DoEffect(player, item, originalVelocity, shootSpeed, damage, knockBack, 0, 0);
+                DoEffect(player, position, item, originalVelocity, shootSpeed, damage, knockBack, 0, 0);
             }
             if (Style == SpellStyle.Default || Style == SpellStyle.HoldRelease)
             {
                 player.statMana -= getTotalManaCost(player);
             }
+            else
+            {
+                player.statMana -= getTotalManaCost(player, getChargePercentage());
+            }
+            data = new ActiveEffectData(this);
             data.MaxOutCooldown();
+            Element = SpellElement.None;
         }
-        public virtual void DoEffect(Player player, Item item, Vector2 originalVelocity, float shootSpeed, int damage, float knockBack, int importantRun = 0, int totalImportantRuns = 0)
+        public virtual void DoEffect(Player player, Vector2 position, Item item, Vector2 originalVelocity, float shootSpeed, int damage, float knockBack, int importantRun = 0, int totalImportantRuns = 0)
         {
         }
 
@@ -161,6 +175,10 @@ namespace Spellsmith.Items.EnchantedRunes
                 ChooseElement(spellProjectile);
                 projectile.netUpdate = true;
             }
+        }
+        public virtual void DoChargeVisuals(Player player, Vector2 position, Item item)
+        {
+
         }
         public void ChooseElement(SpellProjectile spellProjectile)
         {
@@ -190,11 +208,14 @@ namespace Spellsmith.Items.EnchantedRunes
             if (elements.Count > 0)
             {
                 spellProjectile.Element = elements[Main.rand.Next(elements.Count)];
+                Element = spellProjectile.Element;
+
                 return;
             }
+            Element = SpellElement.None;
             spellProjectile.Element = SpellElement.None;
         }
-        public virtual void ShootProjectile(Player player, Vector2 originalVelocity, float speed, int damage, float knockBack, int projectileID, int importantRun, int totalImportantRuns)
+        public virtual void ShootProjectile(Player player, Vector2 position, Vector2 originalVelocity, float speed, int damage, float knockBack, int projectileID, int importantRun, int totalImportantRuns)
         {
             float importantSpread = totalImportantRuns == 0 ? 0 : getImportantSpread(importantRun, totalImportantRuns, 8);
             int totalRuns = getTotalRuns();
@@ -202,7 +223,7 @@ namespace Spellsmith.Items.EnchantedRunes
             for (int j = 0; j < totalRuns; j++)
             {
                 Vector2 perturbedSpeed = getImportantShootVelocity(originalVelocity, speed, spread, importantSpread);
-                int projectile = Projectile.NewProjectile(player.Center.X, player.Center.Y, perturbedSpeed.X, perturbedSpeed.Y, projectileID, getTotalDamage(damage), getTotalKnockBack(knockBack), player.whoAmI);
+                int projectile = Projectile.NewProjectile(position.X, position.Y, perturbedSpeed.X, perturbedSpeed.Y, projectileID, getTotalDamage(damage), getTotalKnockBack(knockBack), player.whoAmI);
                 ModifyProjectile(player, Main.projectile[projectile]);
             }
         }
@@ -235,14 +256,18 @@ namespace Spellsmith.Items.EnchantedRunes
             return (int)Math.Max(1, originalDamage * modifiers.damageMultiplier);
         }
 
-        public virtual int getTotalManaCost(Player player)
+        public virtual float getChargePercentage()
+        {
+            return data.chargeProgress / maxCharge;
+        }
+        public virtual int getTotalManaCost(Player player, float charge = 1f)
         {
             double cost = (manaCost * modifiers.manaCostMultiplier) * player.manaCost;
             if (bundledEffects > 1)
             {
                 cost *= Math.Pow(1.1f, bundledEffects);
             }
-            return (int)cost;
+            return (int)(cost * charge);
         }
 
         public virtual int getTotalCooldown()
@@ -291,15 +316,86 @@ namespace Spellsmith.Items.EnchantedRunes
             perturbedSpeed *= scale;
             return perturbedSpeed;
         }
+
+
+        public static int[] fireDusts = new int[] { 6, 127, 158 };
+        public static int[] frostDusts = new int[] { 135, 39, 132 };
+        public static int[] holyDusts = new int[] { 199, 49, 188 };
+        public static int[] corruptDusts = new int[] { 75, 61, 74 };
+        public static int[] crimsonDusts = new int[] { 170, 125, 130 };
+
+        public static Color SetupColor(Color defaultColor, SpellElement Element)
+        {
+            switch (Element)
+            {
+                case (SpellElement.None):
+                    {
+                        return defaultColor;
+                    }
+                case (SpellElement.Fiery):
+                    {
+                        return new Color(255, 142, 47);
+                    }
+                case (SpellElement.Frost):
+                    {
+                        return new Color(21, 144, 222);
+                    }
+                case (SpellElement.Holy):
+                    {
+                        return new Color(236, 83, 179);
+                    }
+                case (SpellElement.Corrupt):
+                    {
+                        return new Color(181, 255, 56);
+                    }
+
+                case (SpellElement.Crimson):
+                    {
+                        return new Color(255, 47, 47);
+                    }
+            }
+            return defaultColor;
+        }
+        public static int GetDust(int value, int defaultDust, SpellElement Element)
+        {
+            switch (Element)
+            {
+                case (SpellElement.None):
+                    {
+                        return defaultDust;
+                    }
+                case (SpellElement.Fiery):
+                    {
+                        return fireDusts[value];
+                    }
+                case (SpellElement.Frost):
+                    {
+                        return frostDusts[value];
+                    }
+                case (SpellElement.Holy):
+                    {
+                        return holyDusts[value];
+                    }
+                case (SpellElement.Corrupt):
+                    {
+                        return corruptDusts[value];
+                    }
+                case (SpellElement.Crimson):
+                    {
+                        return crimsonDusts[value];
+                    }
+            }
+            return 0;
+        }
         #endregion
     }
     public class EffectModifiers
     {
-        public EffectModifiers(Effect effect)
+        public EffectModifiers(SpellEffect effect)
         {
             this.effect = effect;
         }
-        public Effect effect;
+        public SpellEffect effect;
         //stacking modifiers
         public int scatterModifier = 0;
         public int flurryModifier = 0;
@@ -322,11 +418,11 @@ namespace Spellsmith.Items.EnchantedRunes
     }
     public class ActiveEffectData
     {
-        public ActiveEffectData(Effect effect)
+        public ActiveEffectData(SpellEffect effect)
         {
             this.effect = effect;
         }
-        public Effect effect;
+        public SpellEffect effect;
 
         public float chargeProgress = 0;
         public float cooldown = 0;
@@ -334,19 +430,25 @@ namespace Spellsmith.Items.EnchantedRunes
         public bool OnCooldown => cooldown > 0;
         public virtual bool Charge(Player player)
         {
-            Effect.SpellStyle Style = effect.Style;
-            if (Style == Effect.SpellStyle.Charge || Style == Effect.SpellStyle.ChargeRelease)
+            SpellEffect.SpellStyle Style = effect.Style;
+            player.itemTime++;
+            player.itemAnimation++;
+            Vector2 direction = Vector2.Normalize(player.Center - Main.MouseWorld);
+            player.direction = Main.MouseWorld.X < player.Center.X ? -1 : 1;
+            if (player.direction == 1)
             {
-                player.itemTime++;
-                player.itemAnimation++;
-                if (chargeProgress % 10 == 0)
-                {
-                    player.statMana -= (int)(effect.getTotalManaCost(player) * 10 / effect.maxCharge);
-                }
+                direction = -direction;
+            }
+            player.itemRotation = direction.ToRotation();
+            if (chargeProgress < effect.maxCharge)
+            {
                 chargeProgress++;
+            }
+            if (Style == SpellEffect.SpellStyle.Charge || Style == SpellEffect.SpellStyle.ChargeRelease)
+            {
                 return chargeProgress >= effect.maxCharge;
             }
-            return true;
+            return false;
         }
         public virtual bool ReduceCooldown()
         {
@@ -364,6 +466,7 @@ namespace Spellsmith.Items.EnchantedRunes
         public virtual void MaxOutCooldown()
         {
             cooldown = effect.getTotalCooldown();
+            chargeProgress = 0;
         }
     }
 }

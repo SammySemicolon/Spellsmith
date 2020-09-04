@@ -35,9 +35,9 @@ namespace Spellsmith.Items.EnchantedRunes
         }
         public DefaultFuckUpEffect fuckUpEffect => new DefaultFuckUpEffect();
     }
-    public class DefaultFuckUpEffect : Effect
+    public class DefaultFuckUpEffect : SpellEffect
     {
-        public override void DoEffect(Player player, Item item, Vector2 originalVelocity, float shootSpeed, int damage, float knockBack, int importantRun = 0, int totalImportantRuns = -10)
+        public override void DoEffect(Player player, Vector2 position, Item item, Vector2 originalVelocity, float shootSpeed, int damage, float knockBack, int importantRun = 0, int totalImportantRuns = -10)
         {
             if (player is Player)
             {

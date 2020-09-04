@@ -1,10 +1,9 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Spellsmith.Dusts;
+using Spellsmith.Items.EnchantedRunes;
 using System;
 using Terraria;
 using Terraria.ID;
-using Terraria.ModLoader;
 using static Terraria.ModLoader.ModContent;
 
 namespace Spellsmith.Projectiles.RuneProjectiles
@@ -101,8 +100,8 @@ namespace Spellsmith.Projectiles.RuneProjectiles
 			Main.PlaySound(SoundID.Item62, projectile.Center);
 			Main.PlaySound(SoundID.Item91, projectile.Center);
 			float particleCount = 160 * projectile.scale;
-			int flameDust = GetPrimaryDust(6);
-			int sparkDust = GetSecondaryDust(133);
+			int flameDust = SpellEffect.GetDust(0,6, Element);
+			int sparkDust = SpellEffect.GetDust(1,133, Element);
 			int smokeDust = 31;
 
 			for (int i = 0; i < particleCount; i++) //fire circle

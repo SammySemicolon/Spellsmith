@@ -5,16 +5,16 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.GameInput;
 using Terraria.ModLoader;
-using static Spellsmith.Items.EnchantedRunes.Effect;
+using static Spellsmith.Items.EnchantedRunes.SpellEffect;
 
 namespace Spellsmith
 {
     public class SpellsmithPlayer : ModPlayer
     {
         public int selectedSpell; 
-        public List<Effect> activeEffects = new List<Effect>();
+        public List<SpellEffect> activeEffects = new List<SpellEffect>();
         public List<ActiveEffectData> tickingEffects = new List<ActiveEffectData>();
-        List<Effect> removedEffects;
+        List<SpellEffect> removedEffects;
         List<ActiveEffectData> removedData;
         public Item activeBlaster;
         public override void UpdateLifeRegen()
@@ -31,46 +31,51 @@ namespace Spellsmith
                 Spellsmith.instance.HideAbilityUI();
             }
 
-            removedEffects = new List<Effect>();
+            removedEffects = new List<SpellEffect>();
             removedData = new List<ActiveEffectData>();
             if (activeBlaster != null)
             {
-                foreach (Effect effect in activeEffects)
+                foreach (SpellEffect effect in activeEffects)
                 {
                     if (effect.CanRunSpell(player, activeBlaster))
                     {
                         Vector2 velocity = Vector2.Normalize(Main.MouseWorld - player.Center) * activeBlaster.shootSpeed;
+                        Vector2 castPosition = player.Center + (Vector2.Normalize(Main.MouseWorld - player.Center) * (activeBlaster.width + 12));
+                        
                         switch (effect.Style)
                         {
                             case SpellStyle.Default:
                                 {
-                                    RunSpell(effect, velocity);
+                                    RunSpell(effect, velocity, castPosition);
                                     break;
                                 }
                             case SpellStyle.HoldRelease:
                                 {
                                     effect.data.Charge(player);
+                                    effect.DoChargeVisuals(player, castPosition, activeBlaster);
                                     if (!player.channel)
                                     {
-                                        RunSpell(effect, velocity);
+                                        RunSpell(effect, velocity, castPosition);
                                     }
                                     break;
                                 }
                             case SpellStyle.Charge:
                                 {
+                                    effect.DoChargeVisuals(player, castPosition, activeBlaster);
                                     bool success = effect.data.Charge(player);
                                     if (success || !player.channel)
                                     {
-                                        RunSpell(effect, velocity);
+                                        RunSpell(effect, velocity, castPosition);
                                     }
                                     break;
                                 }
                             case SpellStyle.ChargeRelease:
                                 {
+                                    effect.DoChargeVisuals(player, castPosition,activeBlaster);
                                     effect.data.Charge(player);
                                     if (!player.channel)
                                     {
-                                        RunSpell(effect, velocity);
+                                        RunSpell(effect, velocity, castPosition);
                                     }
                                     break;
                                 }
@@ -91,7 +96,7 @@ namespace Spellsmith
                     removedData.Add(tickingEffect);
                 }
             }
-            foreach (Effect effectToRemove in removedEffects)
+            foreach (SpellEffect effectToRemove in removedEffects)
             {
                 if (activeEffects.Contains(effectToRemove))
                 {
@@ -106,9 +111,9 @@ namespace Spellsmith
                 }
             }
         }
-        public void RunSpell(Effect effect, Vector2 velocity)
+        public void RunSpell(SpellEffect effect, Vector2 velocity, Vector2 position)
         {
-            effect.RunSpell(player, activeBlaster, velocity, activeBlaster.shootSpeed, activeBlaster.damage, activeBlaster.knockBack);
+            effect.RunSpell(player, position, activeBlaster, velocity, activeBlaster.shootSpeed, activeBlaster.damage, activeBlaster.knockBack);
             if (effect.getTotalCooldown() != 0)
             {
                 tickingEffects.Add(effect.data);

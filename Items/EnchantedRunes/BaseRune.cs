@@ -10,7 +10,7 @@ namespace Spellsmith.Items.EnchantedRunes
 		{
 			Tooltip.SetDefault("Based");
 		}
-		public virtual void setup(Effect effect)
+		public virtual void setup(SpellEffect effect)
 		{
 
 		}

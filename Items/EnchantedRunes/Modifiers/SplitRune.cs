@@ -13,7 +13,7 @@ namespace Spellsmith.Items.EnchantedRunes.Modifiers
 			AddAccuracyIncreaseTooltip(tooltips, 10);
 			base.ModifyTooltips(tooltips);
 		}
-		public override void setup(Effect effect)
+		public override void setup(SpellEffect effect)
 		{
 			effect.modifiers.splitModifier++;
 			effect.modifiers.damageMultiplier *= 0.8f;
