@@ -103,13 +103,13 @@ namespace Spellsmith.Projectiles.RuneProjectiles
 			int flameDust = SpellEffect.GetDust(0,6, Element);
 			int sparkDust = SpellEffect.GetDust(1,133, Element);
 			int smokeDust = 31;
-
 			for (int i = 0; i < particleCount; i++) //fire circle
 			{
 				float angle = MathHelper.Lerp(0, 6.28f, i / particleCount);
 				Vector2 position = projectile.Center + Vector2.One.RotatedBy(angle) * radius;
 				Dust dust = Main.dust[Dust.NewDust(position, 0, 0, flameDust, 0, 0, 0, default, Main.rand.NextFloat(1.2f, 1.6f))];
 				dust.noGravity = true;
+				dust.noLight = false;
 				dust.fadeIn = Main.rand.NextFloat(1, 1.75f);
 				dust.velocity = Vector2.Normalize(projectile.Center - position) * -0.5f;
 			}
@@ -118,6 +118,7 @@ namespace Spellsmith.Projectiles.RuneProjectiles
 				Vector2 position = new Vector2(projectile.position.X + projectile.width / 4, projectile.position.Y + projectile.height / 4);
 				Dust dust = Main.dust[Dust.NewDust(position, projectile.width / 2, projectile.height / 2, flameDust, Main.rand.NextFloat(-3.5f, 3.5f), Main.rand.NextFloat(-3.5f, 3.5f), 100, default, Main.rand.NextFloat(1.2f, 2f))];
 				dust.noGravity = true;
+				dust.noLight = false;
 				if (Main.rand.Next(2) == 0)
 				{
 					dust.scale *= 0.75f;
@@ -131,6 +132,7 @@ namespace Spellsmith.Projectiles.RuneProjectiles
 				Vector2 position = projectile.Center + Vector2.One.RotatedBy(angle * Main.rand.NextFloat(0.9f, 1.2f)) * radius;
 				Dust dust = Main.dust[Dust.NewDust(position, 0, 0, sparkDust, 0, 0, 0, default, Main.rand.NextFloat(0.4f, 0.8f))];
 				dust.noGravity = true;
+				dust.noLight = false;
 				dust.velocity = Vector2.Normalize(projectile.Center - position) * 0.25f;
 			}
 			particleCount = 30 * projectile.scale;
@@ -139,6 +141,7 @@ namespace Spellsmith.Projectiles.RuneProjectiles
 				Vector2 position = new Vector2(projectile.position.X + projectile.width / 4, projectile.position.Y + projectile.height / 4);
 				Dust dust = Main.dust[Dust.NewDust(position, projectile.width / 2, projectile.height / 2, sparkDust, Main.rand.NextFloat(-4.5f, 4.5f), Main.rand.NextFloat(-4.5f, 4.5f), 100, default, Main.rand.NextFloat(0.4f, 0.8f))];
 				dust.noGravity = true;
+				dust.noLight = false;
 				if (Main.rand.Next(2) == 0)
 				{
 					dust.scale *= 0.5f;
@@ -151,6 +154,7 @@ namespace Spellsmith.Projectiles.RuneProjectiles
 
 				Dust dust = Main.dust[Dust.NewDust(position, projectile.width / 2, projectile.height / 2, smokeDust, Main.rand.NextFloat(-2.5f, 2.5f), Main.rand.NextFloat(-2.5f, 2.5f), 100, new Color(), Main.rand.NextFloat(1.2f,3f))];
 				dust.noGravity = true;
+				dust.noLight = false;
 			}
 			for (int i = 0; i < particleCount; i++)
 			{

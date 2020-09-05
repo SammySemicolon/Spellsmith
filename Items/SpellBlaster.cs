@@ -43,6 +43,7 @@ namespace Spellsmith.Items
             {
                 foreach (SpellEffect effect in spellRune.effects)
                 {
+                    effect.SortOutClass(item);
                     if (!effect.CanRunSpell(player,item))
                     {
                         return false;
@@ -53,19 +54,16 @@ namespace Spellsmith.Items
         }
         public override bool Shoot(Player player, ref Vector2 position, ref float speedX, ref float speedY, ref int type, ref int damage, ref float knockBack)
         {
-            SpellsmithPlayer modPlayer = player.GetModPlayer<SpellsmithPlayer>();
             setupBlaster(player);
-
+            SpellsmithPlayer modPlayer = player.GetModPlayer<SpellsmithPlayer>();
             if (spellRune != null)
             {
                 foreach (SpellEffect effect in spellRune.effects)
                 {
-                    if (!modPlayer.activeEffects.Contains(effect))
+                    if (effect.CanRunSpell(player, item))
                     {
-                        if (effect.CanRunSpell(player, item))
-                        {
-                            modPlayer.activeEffects.Add(effect);
-                        }
+                        effect.Init(player, position, item);
+                        modPlayer.activeEffects.Add(effect);
                     }
                 }
             }

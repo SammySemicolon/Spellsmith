@@ -31,7 +31,7 @@ namespace Spellsmith.Items.EnchantedRunes.Effects
         public override void DoEffect(Player player, Vector2 position, Item item, Vector2 originalVelocity, float shootSpeed, int damage, float knockBack, int importantRun = 0, int totalImportantRuns = 0)
 		{
 			float charge = getChargePercentage();
-			float finalShootSpeed = MathHelper.Max(5, 10 * getChargePercentage());
+			float finalShootSpeed = MathHelper.Max(2, 4 * getChargePercentage());
 			ShootProjectile(player, position, originalVelocity, finalShootSpeed, (int)(damage * (charge+1)), knockBack * (charge + 1), ModContent.ProjectileType<HexBolt>(), importantRun, totalImportantRuns);
 		}
 		public override void DoChargeVisuals(Player player, Vector2 position, Item item)
