@@ -24,7 +24,6 @@ namespace Spellsmith.Projectiles.RuneProjectiles
 			projectile.width = 200;
 			projectile.height = 200;
 			projectile.timeLeft = 10;
-			projectile.penetrate = -1;
 			projectile.extraUpdates = 1;
 			projectile.friendly = true;
 			projectile.ranged = true;
@@ -36,7 +35,7 @@ namespace Spellsmith.Projectiles.RuneProjectiles
 		public override void PostDraw(SpriteBatch spriteBatch, Color lightColor)
 		{
 			spriteBatch.End();
-			Main.spriteBatch.Begin(default, BlendState.Additive, default, default, default, default, Main.GameViewMatrix.ZoomMatrix);
+			Main.spriteBatch.Begin(default, BlendState.Additive, default, default, default, default, Main.GameViewMatrix.EffectMatrix);
 			Vector2 drawOrigin = new Vector2(projectile.width / 2, projectile.height / 2);
 			for (int k = 0; k < projectile.oldPos.Length; k++)
 			{
@@ -47,17 +46,16 @@ namespace Spellsmith.Projectiles.RuneProjectiles
 						Vector2 glowPos = projectile.oldPos[k] - Main.screenPosition + drawOrigin + new Vector2(0f, projectile.gfxOffY);
 						Color finalColor = color * ((float)(projectile.oldPos.Length - k) / projectile.oldPos.Length);
 						float glowScale = (projectile.scale - projectile.scale * (k / projectile.oldPos.Length)) * 0.5f;
-						spriteBatch.Draw(GetTexture("Spellsmith/VFX/LongTrail"), glowPos, null, finalColor, lastVelocity.ToRotation() + 1.57f, drawOrigin, glowScale, SpriteEffects.None, 0f);
+						string texture = "Spellsmith/VFX/LongTrail";
+						float rotation = lastVelocity.ToRotation() + 1.57f;
+						if (k == 0)
+                        {
+							texture = "Spellsmith/VFX/Flash";
+							rotation = projectile.rotation;
+						}
+						spriteBatch.Draw(GetTexture(texture), glowPos, null, finalColor, rotation, drawOrigin, glowScale, SpriteEffects.None, 0f);
 					}
 				}
-			}
-			if (!boom)
-			{
-				Vector2 flashPos = projectile.position + Vector2.Normalize(projectile.velocity) - Main.screenPosition + drawOrigin + new Vector2(0f, projectile.gfxOffY);
-				float sin = Math.Abs((float)Math.Sin(projectile.ai[0]));
-
-				float flashScale = projectile.scale * 0.6f + sin * 0.1f;
-				spriteBatch.Draw(GetTexture("Spellsmith/VFX/Flash"), flashPos, null, color, projectile.rotation, drawOrigin, flashScale, SpriteEffects.None, 0f);
 			}
 			Main.spriteBatch.End();
 			Main.spriteBatch.Begin();
@@ -110,7 +108,6 @@ namespace Spellsmith.Projectiles.RuneProjectiles
 				Dust dust = Main.dust[Dust.NewDust(position, 0, 0, flameDust, 0, 0, 0, default, Main.rand.NextFloat(1.2f, 1.6f))];
 				dust.noGravity = true;
 				dust.noLight = false;
-				dust.fadeIn = Main.rand.NextFloat(1, 1.75f);
 				dust.velocity = Vector2.Normalize(projectile.Center - position) * -0.5f;
 			}
 			for (int i = 0; i < particleCount; i++)
@@ -122,7 +119,6 @@ namespace Spellsmith.Projectiles.RuneProjectiles
 				if (Main.rand.Next(2) == 0)
 				{
 					dust.scale *= 0.75f;
-					dust.fadeIn = Main.rand.NextFloat(1, 1.8f);
 				}
 			}
 			particleCount = 60 * projectile.scale;
@@ -145,7 +141,6 @@ namespace Spellsmith.Projectiles.RuneProjectiles
 				if (Main.rand.Next(2) == 0)
 				{
 					dust.scale *= 0.5f;
-					dust.fadeIn = Main.rand.NextFloat(1, 1.2f);
 				}
 			}
 			for (int i = 0; i < particleCount; i++)

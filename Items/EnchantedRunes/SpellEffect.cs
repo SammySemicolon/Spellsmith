@@ -3,6 +3,7 @@ using Spellsmith.Projectiles.RuneProjectiles;
 using System;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 using static Spellsmith.Items.EnchantedRunes.SpellEffect;
 
@@ -223,6 +224,11 @@ namespace Spellsmith.Items.EnchantedRunes
             {
                 ChooseElement();
             }
+            else
+            {
+                projectile.damage += (int)(projectile.damage * getChargePercentage());
+                projectile.knockBack += projectile.knockBack * getChargePercentage();
+            }
         }
         public virtual bool ReduceCooldown()
         {
@@ -338,13 +344,14 @@ namespace Spellsmith.Items.EnchantedRunes
             perturbedSpeed *= scale;
             return perturbedSpeed;
         }
+        #endregion
 
-
+        #region static stuff
         public static int[] fireDusts = new int[] { 6, 127, -1 };
         public static int[] frostDusts = new int[] { 135, 172, -1 };
-        public static int[] holyDusts = new int[] { 164, 218, -1 };
+        public static int[] holyDusts = new int[] { 164, 133, -1 };
         public static int[] corruptDusts = new int[] { 75, 179, -1 };
-        public static int[] crimsonDusts = new int[] { 164, 218, 170 };
+        public static int[] crimsonDusts = new int[] { 218, 170, -1 };
 
         public static Color SetupColor(Color defaultColor, SpellElement Element)
         {
@@ -408,6 +415,44 @@ namespace Spellsmith.Items.EnchantedRunes
                     }
             }
             return 0;
+        }
+        public static void SpellEffectHit(NPC target, Player player, int damage, float potency, SpellElement Element)
+        {
+            switch (Element)
+            {
+                case (SpellElement.None):
+                    {
+                        break;
+                    }
+                case (SpellElement.Fiery):
+                    {
+                        target.AddBuff(BuffID.OnFire, (int)(10 * damage * potency));
+                        break;
+                    }
+                case (SpellElement.Frost):
+                    {
+                        target.AddBuff(BuffID.Frostburn, (int)(10 * damage * potency));
+                        break;
+                    }
+                case (SpellElement.Holy):
+                    {
+                        int mana = (int)(damage / 10 * potency);
+                        player.ManaEffect(mana);
+                        player.statMana += mana;
+                        target.AddBuff(BuffID.Confused, (int)(10 * damage * potency));
+                        break;
+                    }
+                case (SpellElement.Corrupt):
+                    {
+                        target.AddBuff(BuffID.CursedInferno, (int)(20 * damage * potency));
+                        break;
+                    }
+                case (SpellElement.Crimson):
+                    {
+                        target.AddBuff(BuffID.Ichor, (int)(20 * damage * potency));
+                        break;
+                    }
+            }
         }
         #endregion
     }

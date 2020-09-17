@@ -26,15 +26,14 @@ namespace Spellsmith
 		}
 		public static bool IsTargetValid(NPC npc) => npc.type == NPCID.TargetDummy || (npc.active && !npc.friendly && !npc.immortal && !npc.dontTakeDamage);
 
+		public static bool CanHomeIn(NPC npc) => npc.active && !npc.friendly && !npc.immortal && !npc.dontTakeDamage;
+
 		public static void CircleAOEDamage(Vector2 center, Player player, int damage, float knockBack, int hitDirection, bool crit, int radius)
 		{
-			foreach (NPC npc in Main.npc.Where(n => n.active && CheckCircularCollision(center, n.Hitbox, radius)))
-            {
-				if (IsTargetValid(npc))
-				{
-					player.ApplyDamageToNPC(npc, damage, knockBack, hitDirection, crit);
-				}
-            }
+			foreach (NPC npc in Main.npc.Where(n => IsTargetValid(n) && CheckCircularCollision(center, n.Hitbox, radius)))
+			{
+				player.ApplyDamageToNPC(npc, (int)(damage * Main.rand.NextFloat(0.85f, 1.35f)), knockBack, hitDirection, crit);
+			}
 		}
 	}
 }

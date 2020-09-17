@@ -15,7 +15,7 @@ namespace Spellsmith
         public List<SpellEffect> activeEffects = new List<SpellEffect>();
         public Item activeBlaster;
         public override void UpdateLifeRegen()
-        {
+        {/*
             if (Spellsmith.instance.abilityInterface.CurrentState == null)
             {
                 if (player.HeldItem.modItem is SpellBlaster)
@@ -27,7 +27,7 @@ namespace Spellsmith
             {
                 Spellsmith.instance.HideAbilityUI();
             }
-
+            */
             if (activeBlaster != null)
             {
                 for (int i = 0; i < activeEffects.Count; i++)
@@ -35,12 +35,13 @@ namespace Spellsmith
                     if (i < activeEffects.Count)
                     {
                         SpellEffect effect = activeEffects[i];
+                        Main.NewText(effect);
                         if (effect.OnCooldown)
                         {
                             bool success = effect.ReduceCooldown();
                             if (success)
                             {
-                                activeEffects.RemoveAt(i);
+                                activeEffects.Remove(effect);
                             }
                         }
                         else if (effect.CanRunSpell(player, activeBlaster))
@@ -95,6 +96,10 @@ namespace Spellsmith
         public void RunSpell(SpellEffect effect, Vector2 velocity, Vector2 position)
         {
             effect.RunSpell(player, position, activeBlaster, velocity, activeBlaster.shootSpeed, activeBlaster.damage, activeBlaster.knockBack);
+            if (effect.getTotalCooldown() == 0)
+            {
+                activeEffects.Remove(effect);
+            }
         }
         public override void ProcessTriggers(TriggersSet triggersSet)
         {
